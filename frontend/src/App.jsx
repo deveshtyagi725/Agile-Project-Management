@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
+import { useAuth } from './hooks/useAuth'
 import { Sidebar } from './components/Sidebar'
 import { Header } from './components/Header'
 import { Notification } from './components/Notification'
@@ -9,12 +10,6 @@ import { ProjectDetails } from './pages/ProjectDetails'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import './index.css'
-
-// Protected route component
-const ProtectedRoute = ({ element }) => {
-  const token = localStorage.getItem('token')
-  return token ? element : <Navigate to="/login" replace />
-}
 
 // Layout for authenticated pages
 function AppContent() {
@@ -36,23 +31,39 @@ function AppContent() {
   )
 }
 
-function App() {
-  const token = localStorage.getItem('token')
+function AppRoutes() {
+  const { isAuthenticated, loading } = useAuth()
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Loading...</h2>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <Routes>
+      {/* Auth routes - always accessible */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      
+      {/* Protected routes */}
+      <Route
+        path="/*"
+        element={isAuthenticated ? <AppContent /> : <Navigate to="/login" replace />}
+      />
+    </Routes>
+  )
+}
+
+function App() {
   return (
     <Router>
       <AppProvider>
-        <Routes>
-          {/* Auth routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {/* Protected routes */}
-          <Route
-            path="/*"
-            element={token ? <AppContent /> : <Navigate to="/login" replace />}
-          />
-        </Routes>
+        <AppRoutes />
       </AppProvider>
     </Router>
   )
