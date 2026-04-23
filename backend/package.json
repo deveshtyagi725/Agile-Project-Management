@@ -4,17 +4,18 @@
   "description": "Production-ready backend for Agile Project Management Tool",
   "main": "src/index.js",
   "type": "module",
-  "scripts": {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
-    "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset",
-    "db:seed": "node src/utils/seed.js",
-    "db:studio": "prisma studio",
-    "lint": "eslint src",
-    "test": "jest",
-    "format": "prettier --write \"src/**/*.js\""
-  },
+ "scripts": {
+  "dev": "node --watch src/index.js",
+  "start": "prisma migrate deploy && node src/index.js",
+  "build": "prisma generate && prisma migrate deploy",
+  "db:migrate": "prisma migrate dev",
+  "db:reset": "prisma migrate reset",
+  "db:seed": "node src/utils/seed.js",
+  "db:studio": "prisma studio",
+  "lint": "eslint src",
+  "test": "jest",
+  "format": "prettier --write \"src/**/*.js\""
+},
   "keywords": [
     "agile",
     "project-management",

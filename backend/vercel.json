@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "framework": "nodejs",
+  "public": false,
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "NODE_ENV": "production",
+    "FRONTEND_URL": "@frontend_url",
+    "JWT_SECRET": "@jwt_secret"
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
+}
