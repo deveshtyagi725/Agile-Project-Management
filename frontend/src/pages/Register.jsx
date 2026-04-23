@@ -25,22 +25,35 @@ export const Register = () => {
     }
 
     setIsLoading(true)
+    setError('')
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+      const res = await axios.post(`${apiUrl}/auth/register`, {
         name: formData.name,
         email: formData.email,
         password: formData.password
+      }, {
+        headers: { 'Content-Type': 'application/json' }
       })
 
-      const { token, user } = res.data.data
+      // Extract token and user from response
+      const { token, user } = res.data?.data || res.data
+      
+      if (!token || !user) {
+        throw new Error('Invalid response format: missing token or user')
+      }
 
+      // Store in localStorage
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(user))
 
-      navigate('/dashboard')
+      // Navigate to dashboard
+      setTimeout(() => navigate('/dashboard'), 100)
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed')
+      console.error('Registration error:', err)
+      const errorMessage = err.response?.data?.message || err.message || 'Registration failed'
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }

@@ -19,17 +19,31 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, formData)
-      const { token, user } = res.data.data
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+      const res = await axios.post(`${apiUrl}/auth/login`, formData, {
+        headers: { 'Content-Type': 'application/json' }
+      })
 
+      // Extract token and user from response
+      const { token, user } = res.data?.data || res.data
+      
+      if (!token || !user) {
+        throw new Error('Invalid response format: missing token or user')
+      }
+
+      // Store in localStorage
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(user))
 
-      navigate('/dashboard')
+      // Navigate to dashboard
+      setTimeout(() => navigate('/dashboard'), 100)
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed')
+      console.error('Login error:', err)
+      const errorMessage = err.response?.data?.message || err.message || 'Login failed'
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
